@@ -20,19 +20,14 @@ package cmd
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"os/exec"
 
-	apiextensionv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-
-	"github.com/markbates/pkger"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/klog"
 )
 
 func toYaml(objs []runtime.Object) ([]string, error) {
@@ -60,26 +55,6 @@ func GetKubeClient() (*rest.Config, error) {
 	}
 
 	return config, nil
-}
-
-func embeddedCRD() *apiextensionv1.CustomResourceDefinition {
-	crdFile, err := pkger.Open("/cmd/static/crd.yaml")
-	if err != nil {
-		klog.Errorf("could not Open MinIO Operator CRD: %s", err.Error())
-		return nil
-	}
-
-	crd := &apiextensionv1.CustomResourceDefinition{}
-	if err = yaml.Unmarshal(streamToByte(crdFile), crd); err != nil {
-		panic(fmt.Sprintf("cannot unmarshal embedded content of %s: %v", CRDYamlPath, err))
-	}
-	return crd
-}
-
-func streamToByte(stream io.Reader) []byte {
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(stream)
-	return buf.Bytes()
 }
 
 func execKubectl(ctx context.Context, args ...string) ([]byte, error) {

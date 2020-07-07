@@ -17,8 +17,5 @@
 
 package cmd
 
-// StaticYamlPath is path to directory with all the static yaml files
-const StaticYamlPath = "/cmd/static/crd.yaml"
-
-// CRDYamlPath is path to MinIO Operator CRD
-const CRDYamlPath = "/cmd/static/crd.yaml"
+// StaticYamlPath is path to the static yaml files
+const StaticYamlPath = "https://raw.githubusercontent.com/nitisht/kubectl-minio/master/cmd/static/static.yaml"

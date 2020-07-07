@@ -18,17 +18,14 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"io"
-
-	apiextension "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/kudobuilder/kudo/pkg/kudoctl/clog"
 	"github.com/kudobuilder/kudo/pkg/kudoctl/kube"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"k8s.io/klog"
 )
 
 const (
@@ -93,26 +90,7 @@ func (initCmd *initCmd) run() error {
 	clog.V(4).Printf("initializing server")
 
 	if !initCmd.dryRun {
-		config, err := GetKubeClient()
-		if err != nil {
-			klog.Errorf("could not get Kubernetes client: %s", err.Error())
-			return nil
-		}
-
-		kubeClient, err := apiextension.NewForConfig(config)
-		if err != nil {
-			return nil
-		}
-
-		crd := embeddedCRD()
-		if _, err = kubeClient. .ApiextensionsV1().CustomResourceDefinitions().Create(crd); err != nil {
-			if apierrors.IsAlreadyExists(err) {
-				clog.V(4).Printf("crd %v already exists", crd.Name)
-				return nil
-			}
-			klog.Errorf("Error in creating CRD: %s", err.Error())
-			return nil
-		}
+		execKubectl(context.TODO(), "create", "-f", StaticYamlPath)
 	}
 
 	return nil
